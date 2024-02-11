@@ -21,3 +21,7 @@ add_subdirectory(gsoap)
 if (USE_EXTRACTORS)
 	add_subdirectory(libmpq)
 endif()
+
+if(SCRIPT_LIB_ELUNA)
+	add_subdirectory(lualib)
+endif()

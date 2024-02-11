@@ -427,9 +427,14 @@ public:
 
     // Event handler
     EventProcessor m_Events;
+
+#ifdef ENABLE_ELUNA
+	time_t GetSpellCooldownDelay(uint32 spellId);
+	bool HasSpellCategoryCooldown(uint32 spellCategory);
+#endif /* ENABLE_ELUNA */ 
+
 protected:
     explicit SpellCaster() = default;
-
     // cooldown system
     bool GetExpireTime(SpellEntry const& spellEntry, TimePoint& expireTime, bool& isPermanent) const;
 

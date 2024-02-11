@@ -1105,6 +1105,11 @@ class Player final: public Unit
         uint8 FindEquipSlot(ItemPrototype const* proto, uint32 slot, bool swap) const;
         uint32 GetItemCount(uint32 item, bool inBankAlso = false, Item const* skipItem = nullptr) const;
         Item* GetItemByGuid(ObjectGuid guid) const;
+
+#ifdef ENABLE_ELUNA
+        Item* GetItemByEntry(uint32 item) const;            // only for special cases
+#endif
+
         Item* GetItemByPos(uint16 pos) const;
         Item* GetItemByPos(uint8 bag, uint8 slot) const;
         Item* GetWeaponForAttack(WeaponAttackType attackType) const { return GetWeaponForAttack(attackType,false,false); }
@@ -1225,6 +1230,10 @@ class Player final: public Unit
         uint32 GetMoney() const { return GetUInt32Value(PLAYER_FIELD_COINAGE); }
         void LogModifyMoney(int32 d, char const* type, ObjectGuid fromGuid = ObjectGuid(), uint32 data = 0);
         uint32 GetMaxMoney() const;
+
+#ifdef ENABLE_ELUNA
+        void ModifyMoney(int32 d);       
+#else
         void ModifyMoney(int32 d)
         {
             if (d < 0)
@@ -1232,6 +1241,7 @@ class Player final: public Unit
             else
                 SetMoney((uint32)std::min<uint64>(uint64(GetMoney()) + uint64(d), GetMaxMoney()));
         }
+#endif
         void LootMoney(int32 g, Loot* loot);
         std::string GetShortDescription() const; // "player:guid [username:accountId@IP]"
 
@@ -1613,11 +1623,12 @@ class Player final: public Unit
         uint32 m_usedTalentCount;
 
         void UpdateFreeTalentPoints(bool resetIfNeed = true);
-        uint32 GetResetTalentsCost() const;
+
         void UpdateResetTalentsMultiplier() const;
         uint32 CalculateTalentsPoints() const;
         void SendTalentWipeConfirm(ObjectGuid guid) const;
     public:
+		uint32 GetResetTalentsCost() const;
         uint32 GetFreeTalentPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS1); }
         void SetFreeTalentPoints(uint32 points) { SetUInt32Value(PLAYER_CHARACTER_POINTS1, points); }
         bool ResetTalents(bool no_cost = false);
@@ -1735,6 +1746,11 @@ class Player final: public Unit
         void ApplyEquipSpell(SpellEntry const* spellInfo, Item* item, bool apply, bool form_change = false);
         void UpdateEquipSpellsAtFormChange();
         void outDebugStatsValues() const;
+
+#ifdef ENABLE_ELUNA
+		float GetHealthBonusFromStamina() const { return GetHealthBonusFromStamina(GetStat(STAT_STAMINA)); };
+		float GetManaBonusFromIntellect() const { return GetManaBonusFromIntellect(GetStat(STAT_INTELLECT)); };
+#endif
 
         /*********************************************************/
         /***                   SKILLS SYSTEM                   ***/
@@ -2352,6 +2368,10 @@ class Player final: public Unit
         void RemoveLanguage(uint64 languageId) { m_knownLanguagesMask &= ~(1llu << languageId);}
         bool KnowsLanguage(uint64 languageId) const { return (m_knownLanguagesMask & (1llu << languageId)) != 0; }
 
+#ifdef ENABLE_ELUNA
+        void Whisper(const std::string& text, const uint32 language, ObjectGuid receiver);
+		void RemoveAllSpellCooldown();
+#endif
         /*********************************************************/
         /***                   FACTION SYSTEM                  ***/
         /*********************************************************/

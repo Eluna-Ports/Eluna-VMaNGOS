@@ -143,6 +143,9 @@ enum LogType
     LOG_GM_CRITICAL,
     LOG_ANTICHEAT,
     LOG_SCRIPTS,
+#ifdef ENABLE_ELUNA
+    LOG_ELUNA,
+#endif
     LOG_TYPE_MAX
 };
 

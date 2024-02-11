@@ -30,6 +30,10 @@
 #include "Conditions.h"
 #include "GameEventMgr.h"
 #include "CreatureGroups.h"
+
+#ifdef ENABLE_ELUNA
+#include "LuaEngine.h"
+#endif /* ENABLE_ELUNA */
 #include "InstanceData.h"
 
 typedef std::vector<Script*> ScriptVector;
@@ -1822,7 +1826,13 @@ CreatureAI* ScriptMgr::GetCreatureAI(Creature* pCreature)
     Script* pTempScript = m_scripts[pCreature->GetScriptId()];
 
     if (!pTempScript || !pTempScript->GetAI)
+    {
+#ifdef ENABLE_ELUNA
+        if (CreatureAI* luaAI = sEluna->GetAI(pCreature))
+            return luaAI;
+#endif /* ENABLE_ELUNA */
         return nullptr;
+    }
 
     return pTempScript->GetAI(pCreature);
 }
@@ -1862,8 +1872,13 @@ bool ScriptMgr::OnGossipHello(Player* pPlayer, Creature* pCreature)
     Script* pTempScript = m_scripts[pCreature->GetScriptId()];
 
     if (!pTempScript || !pTempScript->pGossipHello)
+    {
+#ifdef ENABLE_ELUNA
+        if (sEluna->OnGossipHello(pPlayer, pCreature))
+            return true;
+#endif /* ENABLE_ELUNA */
         return false;
-
+    }
     pPlayer->PlayerTalkClass->ClearMenus();
 
     return pTempScript->pGossipHello(pPlayer, pCreature);
@@ -1874,7 +1889,13 @@ bool ScriptMgr::OnGossipHello(Player* pPlayer, GameObject* pGameObject)
     Script* pTempScript = m_scripts[pGameObject->GetGOInfo()->ScriptId];
 
     if (!pTempScript || !pTempScript->pGOGossipHello)
+    {
+#ifdef ENABLE_ELUNA
+        if (sEluna->OnGossipHello(pPlayer, pGameObject))
+            return true;
+#endif /* ENABLE_ELUNA */
         return false;
+    }
 
     pPlayer->PlayerTalkClass->ClearMenus();
 
@@ -1904,6 +1925,18 @@ bool ScriptMgr::OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 send
         }
     }
 
+#ifdef ENABLE_ELUNA
+    if (code)
+    {
+        if (sEluna->OnGossipSelectCode(pPlayer, pCreature, sender, action, code))
+            return true;
+    }
+    else
+    {
+        if (sEluna->OnGossipSelect(pPlayer, pCreature, sender, action))
+            return true;
+    }
+#endif /* ENABLE_ELUNA */
     return false;
 }
 
@@ -1930,6 +1963,18 @@ bool ScriptMgr::OnGossipSelect(Player* pPlayer, GameObject* pGameObject, uint32 
         }
     }
 
+#ifdef ENABLE_ELUNA
+    if (code)
+    {
+        if (sEluna->OnGossipSelectCode(pPlayer, pGameObject, sender, action, code))
+            return true;
+    }
+    else
+    {
+        if (sEluna->OnGossipSelect(pPlayer, pGameObject, sender, action))
+            return true;
+    }
+#endif /* ENABLE_ELUNA */
     return false;
 }
 
@@ -1938,8 +1983,13 @@ bool ScriptMgr::OnQuestAccept(Player* pPlayer, Creature* pCreature, Quest const*
     Script* pTempScript = m_scripts[pCreature->GetScriptId()];
 
     if (!pTempScript || !pTempScript->pQuestAcceptNPC)
+    {
+#ifdef ENABLE_ELUNA
+        if (sEluna->OnQuestAccept(pPlayer, pCreature, pQuest))
+            return true;
+#endif /* ENABLE_ELUNA */
         return false;
-
+    }
     pPlayer->PlayerTalkClass->ClearMenus();
 
     return pTempScript->pQuestAcceptNPC(pPlayer, pCreature, pQuest);
@@ -1950,8 +2000,13 @@ bool ScriptMgr::OnQuestAccept(Player* pPlayer, GameObject* pGameObject, Quest co
     Script* pTempScript = m_scripts[pGameObject->GetGOInfo()->ScriptId];
 
     if (!pTempScript || !pTempScript->pGOQuestAccept)
+    {
+#ifdef ENABLE_ELUNA
+        if (sEluna->OnQuestAccept(pPlayer, pGameObject, pQuest))
+            return true;
+#endif /* ENABLE_ELUNA */
         return false;
-
+    }
     pPlayer->PlayerTalkClass->ClearMenus();
 
     return pTempScript->pGOQuestAccept(pPlayer, pGameObject, pQuest);
@@ -1986,7 +2041,12 @@ uint32 ScriptMgr::GetDialogStatus(Player* pPlayer, Creature* pCreature)
     Script* pTempScript = m_scripts[pCreature->GetScriptId()];
 
     if (!pTempScript || !pTempScript->pNPCDialogStatus)
+    {
+#ifdef ENABLE_ELUNA
+        sEluna->GetDialogStatus(pPlayer, pCreature);
+#endif /* ENABLE_ELUNA */
         return DIALOG_STATUS_UNDEFINED;
+    }
 
     pPlayer->PlayerTalkClass->ClearMenus();
 
@@ -1998,7 +2058,12 @@ uint32 ScriptMgr::GetDialogStatus(Player* pPlayer, GameObject* pGameObject)
     Script* pTempScript = m_scripts[pGameObject->GetGOInfo()->ScriptId];
 
     if (!pTempScript || !pTempScript->pGODialogStatus)
+    {
+#ifdef ENABLE_ELUNA
+        sEluna->GetDialogStatus(pPlayer, pGameObject);
+#endif /* ENABLE_ELUNA */
         return DIALOG_STATUS_UNDEFINED;
+    }
 
     pPlayer->PlayerTalkClass->ClearMenus();
 
@@ -2020,8 +2085,13 @@ bool ScriptMgr::OnGameObjectUse(Player* pPlayer, GameObject* pGameObject)
     Script* pTempScript = m_scripts[pGameObject->GetGOInfo()->ScriptId];
 
     if (!pTempScript || !pTempScript->pGOHello)
+    {
+#ifdef ENABLE_ELUNA
+        if (sEluna->OnGameObjectUse(pPlayer, pGameObject))
+            return true;
+#endif /* ENABLE_ELUNA */
         return false;
-
+    }
     pPlayer->PlayerTalkClass->ClearMenus();
 
     return pTempScript->pGOHello(pPlayer, pGameObject);
@@ -2032,7 +2102,13 @@ bool ScriptMgr::OnAreaTrigger(Player* pPlayer, AreaTriggerEntry const* atEntry)
     Script* pTempScript = m_scripts[GetAreaTriggerScriptId(atEntry->id)];
 
     if (!pTempScript || !pTempScript->pAreaTrigger)
+    {
+#ifdef ENABLE_ELUNA
+        if (sEluna->OnAreaTrigger(pPlayer, atEntry))
+            return true;
+#endif /* ENABLE_ELUNA */
         return false;
+    }
 
     return pTempScript->pAreaTrigger(pPlayer, atEntry);
 }
@@ -2062,9 +2138,13 @@ bool ScriptMgr::OnEffectDummy(WorldObject* pCaster, uint32 spellId, SpellEffectI
 {
     Script* pTempScript = m_scripts[pTarget->GetGOInfo()->ScriptId];
 
+#ifdef ENABLE_ELUNA
+    sEluna->OnDummyEffect(pCaster, spellId, effIndex, pTarget);
+#endif /* ENABLE_ELUNA */
     if (!pTempScript || !pTempScript->pEffectDummyGameObj)
+    {
         return false;
-
+    }
     return pTempScript->pEffectDummyGameObj(pCaster, spellId, effIndex, pTarget);
 }
 
