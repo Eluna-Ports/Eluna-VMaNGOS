@@ -144,6 +144,9 @@ enum LogType
     LOG_ANTICHEAT,
     LOG_SCRIPTS,
     LOG_MOVEMENT,
+#ifdef ENABLE_ELUNA
+    LOG_ELUNA,
+#endif
     LOG_TYPE_MAX
 };
 

@@ -57,8 +57,16 @@
 #include "CreatureGroups.h"
 #include "Geometry.h"
 
+#ifdef ENABLE_ELUNA
+#include "LuaEngine.h"
+#endif /* ENABLE_ELUNA */
+
+
 Map::~Map()
 {
+#ifdef ENABLE_ELUNA
+    sEluna->OnDestroy(this);
+#endif /* ENABLE_ELUNA */
     UnloadAll(true);
 
     if (!m_scriptSchedule.empty())
@@ -66,6 +74,11 @@ Map::~Map()
 
     if (m_persistentState)
         m_persistentState->SetUsedByMapState(nullptr);         // field pointer can be deleted after this
+
+#ifdef ENABLE_ELUNA
+    if (Instanceable())
+        sEluna->FreeInstanceId(GetInstanceId());
+#endif /* ENABLE_ELUNA */
 
     if (m_data)
     {
@@ -174,6 +187,10 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
 
     sTransportMgr.SpawnTransportsOnMap(this);
     LoadElevatorTransports();
+
+#ifdef ENABLE_ELUNA
+    sEluna->OnCreate(this);
+#endif /* ENABLE_ELUNA */
 }
 
 // Nostalrius
@@ -439,6 +456,11 @@ bool Map::Add(Player* player)
     NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
     player->GetViewPoint().Event_AddedToWorld(&(*grid)(cell.CellX(), cell.CellY()));
     UpdateObjectVisibility(player, cell, p);
+
+#ifdef ENABLE_ELUNA
+    sEluna->OnMapChanged(player);
+    sEluna->OnPlayerEnter(this, player);
+#endif /* ENABLE_ELUNA */
 
     if (m_data)
         m_data->OnPlayerEnter(player);
@@ -1033,6 +1055,10 @@ void Map::Update(uint32 t_diff)
 
     ScriptsProcess();
 
+#ifdef ENABLE_ELUNA
+    sEluna->OnUpdate(this, t_diff);
+#endif /* ENABLE_ELUNA */
+
     if (m_data)
         m_data->Update(t_diff);
 
@@ -1212,6 +1238,10 @@ void ScriptedEvent::SendEventToAllTargets(uint32 uiData)
 
 void Map::Remove(Player* player, bool remove)
 {
+#ifdef ENABLE_ELUNA
+    sEluna->OnPlayerLeave(this, player);
+#endif /* ENABLE_ELUNA */
+
     if (m_data)
         m_data->OnPlayerLeave(player);
 
@@ -1759,6 +1789,14 @@ void Map::AddObjectToRemoveList(WorldObject* obj)
 {
     MANGOS_ASSERT(obj->GetMapId() == GetId() && obj->GetInstanceId() == GetInstanceId());
 
+
+#ifdef ENABLE_ELUNA
+    if (Creature* creature = obj->ToCreature())
+        sEluna->OnRemove(creature);
+    else if (GameObject* gameobject = obj->ToGameObject())
+        sEluna->OnRemove(gameobject);
+#endif /* ENABLE_ELUNA */
+
     obj->CleanupsBeforeDelete();                            // remove or simplify at least cross referenced links
     std::lock_guard<std::mutex> lock(m_objectsToRemoveLock);
     m_objectsToRemove.insert(obj);
@@ -1976,6 +2014,10 @@ void Map::CreateInstanceData(bool load)
 {
     if (m_data)
         return;
+
+#ifdef ENABLE_ELUNA
+    i_data = sEluna->GetInstanceData(this);
+#endif /* ENABLE_ELUNA */
 
     if (!m_mapEntry->scriptId)
         return;

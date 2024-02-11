@@ -39,7 +39,11 @@
 #include "Util.h"
 #include "Anticheat.h"
 
-void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recv_data)
+#ifdef ENABLE_ELUNA
+#include "LuaEngine.h"
+#endif /* ENABLE_ELUNA */
+
+void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket & recv_data)
 {
     Player  *player =   GetPlayer();
     ObjectGuid lguid = player->GetLootGuid();
@@ -332,6 +336,10 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recv_data*/)
             // in wotlk and after this should be sent for solo looting too
             //player->SendLootMoneyNotify(pLoot->gold);
         }
+        // Used by Eluna
+#ifdef ENABLE_ELUNA
+        sEluna->OnLootMoney(player, pLoot->gold);
+#endif /* ENABLE_ELUNA */
 
         pLoot->gold = 0;
 
@@ -750,6 +758,12 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
             target->GetShortDescription().c_str(), lootGuid.GetString().c_str());
         target->SendNewItem(newitem, uint32(item.count), false, false, true);
         target->OnReceivedItem(newitem);
+
+    // Used by Eluna
+#ifdef ENABLE_ELUNA
+    	sEluna->OnLootItem(target, newitem, item.count, lootGuid);
+#endif /* ENABLE_ELUNA */
+
     }
 
     // mark as looted
