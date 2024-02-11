@@ -50,6 +50,8 @@ jobs:
 
     #git checkout
     - uses: actions/checkout@v4
+      with:
+        submodules: true
 
     #before install dependencies
     - name: ubuntu dependencies
