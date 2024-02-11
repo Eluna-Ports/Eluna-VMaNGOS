@@ -24,6 +24,8 @@ jobs:
     steps:
     #git checkout
     - uses: actions/checkout@v4
+      with:
+        submodules: true
 
     - name: windows dependencies
       #Sets versions for ACE/TBB

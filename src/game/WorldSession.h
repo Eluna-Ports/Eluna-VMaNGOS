@@ -319,6 +319,12 @@ class WorldSession
         bool IsConnected() const { return m_connected; }
         void KickDisconnectedFromWorld() { m_disconnectTimer = 0; }
 
+    #ifdef ENABLE_ELUNA
+        void SendGuildInvite(Player* player, bool alreadyInGuild = false);
+    #endif /* ENABLE_ELUNA */
+
+        
+
         bool PlayerLoading() const { return m_playerLoading; }
         bool PlayerLogout() const { return m_playerLogout; }
         bool PlayerLogoutWithSave() const { return m_playerLogout && m_playerSave; }

@@ -2412,3 +2412,27 @@ void SpellCaster::PrintCooldownList(ChatHandler& chat) const
     chat.PSendSysMessage("Found %u cooldown%s.", cdCount, (cdCount > 1) ? "s" : "");
     chat.PSendSysMessage("Found %u permanent cooldown%s.", permCDCount, (permCDCount > 1) ? "s" : "");
 }
+
+#ifdef ENABLE_ELUNA
+
+time_t SpellCaster::GetSpellCooldownDelay(uint32 spellId)
+{
+	SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(spellId);
+	TimePoint expireTime;
+	bool isInfinite;
+	bool spellCDFound = GetExpireTime(*spellEntry, expireTime, isInfinite);
+
+	auto currTime = sWorld.GetCurrentClockTime();
+    std::chrono::system_clock::duration duration = expireTime - currTime;
+    std::chrono::milliseconds milliSec = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
+	return expireTime > currTime ? milliSec.count() : 0;
+}
+
+bool SpellCaster::HasSpellCategoryCooldown(uint32 spellCategory)
+{
+	if (spellCategory && m_cooldownMap.FindByCategory(spellCategory) != m_cooldownMap.end())
+		return false;
+	return true;
+}
+
+#endif /* ENABLE_ELUNA */
