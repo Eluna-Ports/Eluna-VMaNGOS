@@ -574,8 +574,10 @@ if(SCRIPT_LIB_ELUNA)
     file(GLOB SRC_GRP_ELUNA 
         ${CMAKE_SOURCE_DIR}/src/modules/Eluna/*.cpp
         ${CMAKE_SOURCE_DIR}/src/modules/Eluna/*.h
-        ${CMAKE_SOURCE_DIR}/src/modules/Eluna/VMangos/*.cpp
-        ${CMAKE_SOURCE_DIR}/src/modules/Eluna/VMangos/*.h
+        ${CMAKE_SOURCE_DIR}/src/modules/Eluna/hooks/*.cpp
+        ${CMAKE_SOURCE_DIR}/src/modules/Eluna/hooks/*.h
+        ${CMAKE_SOURCE_DIR}/src/modules/Eluna/methods/VMangos/*.cpp
+        ${CMAKE_SOURCE_DIR}/src/modules/Eluna/methods/VMangos/*.h
     )
     source_group("Eluna" FILES ${SRC_GRP_ELUNA})
 endif()
@@ -601,7 +603,8 @@ target_include_directories(game
     PUBLIC
       $<$<BOOL:${SCRIPT_LIB_ELUNA}>:
             ${CMAKE_SOURCE_DIR}/src/modules/Eluna
-            ${CMAKE_SOURCE_DIR}/src/modules/Eluna/VMangos
+            ${CMAKE_SOURCE_DIR}/src/modules/Eluna/hooks/
+            ${CMAKE_SOURCE_DIR}/src/modules/Eluna/methods/VMangos
         >
 )
 

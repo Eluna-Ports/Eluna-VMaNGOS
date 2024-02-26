@@ -58,6 +58,7 @@
 
 #ifdef ENABLE_ELUNA
 #include "LuaEngine.h"
+#include "ElunaConfig.h"
 #include "ElunaEventMgr.h"
 #endif /* ENABLE_ELUNA */
 
@@ -2299,9 +2300,19 @@ void WorldObject::SetMap(Map* map)
     m_instanceId = map->GetInstanceId();
 
     #ifdef ENABLE_ELUNA
-    delete elunaEvents;
-    // On multithread replace this with a pointer to map's Eluna pointer stored in a map
-    elunaEvents = new ElunaEventProcessor(&Eluna::GEluna, this);
+    //@todo: possibly look into cleanly clearing all pending events from previous map's event mgr.
+
+    // if multistate, delete elunaEvents and set to nullptr. events shouldn't move across states.
+    // in single state, the timed events should move across maps
+    if (!sElunaConfig->IsElunaCompatibilityMode())
+    {
+        delete elunaEvents;
+        elunaEvents = nullptr; // set to null in case map doesn't use eluna
+    }
+
+    if (Eluna* e = map->GetEluna())
+        if (!elunaEvents)
+            elunaEvents = new ElunaEventProcessor(e, this);
     #endif
 
     // Order is important, must be done after m_currMap is set
@@ -2503,7 +2514,8 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
 
 #ifdef ENABLE_ELUNA
     if (Unit* summoner = ToUnit())
-        sEluna->OnSummoned(pCreature, summoner);
+        if (Eluna* e = GetEluna())
+            e->OnSummoned(pCreature, summoner);
 #endif /* ENABLE_ELUNA */
 
     // Creature Linking, Initial load is handled like respawn
@@ -3796,3 +3808,13 @@ bool WorldObject::IsValidHelpfulTarget(Unit const* target, bool checkAlive) cons
 
     return true;
 }
+
+#ifdef ENABLE_ELUNA
+Eluna* WorldObject::GetEluna() const
+{
+    if (IsInWorld())
+        return GetMap()->GetEluna();
+
+    return nullptr;
+}
+#endif

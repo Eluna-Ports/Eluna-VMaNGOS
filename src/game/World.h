@@ -44,6 +44,9 @@
 #include <unordered_map>
 #include <thread>
 
+#ifdef ENABLE_ELUNA
+class Eluna;
+#endif
 class Object;
 class WorldSession;
 class Player;
@@ -489,7 +492,6 @@ enum eConfigBoolValues
     CONFIG_BOOL_OUTDOORPVP_SI_ENABLE,
     CONFIG_BOOL_MMAP_ENABLED,
     CONFIG_BOOL_SKIP_CINEMATICS,
-    CONFIG_BOOL_ELUNA_ENABLED,
     CONFIG_BOOL_PLAYER_COMMANDS,
     CONFIG_BOOL_FORCE_LOGOUT_DELAY,
     CONFIG_BOOL_SAVE_RESPAWN_TIME_IMMEDIATELY,
@@ -901,6 +903,11 @@ class World
         Messager<World>& GetMessager() { return m_messager; }
 
         LFGQueue& GetLFGQueue() { return m_lfgQueue; }
+
+#ifdef ENABLE_ELUNA
+        Eluna* GetEluna() const { return eluna; }
+        Eluna* eluna;
+#endif
     protected:
         void _UpdateGameTime();
         // callback for UpdateRealmCharacters

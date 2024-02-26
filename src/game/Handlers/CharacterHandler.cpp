@@ -46,7 +46,7 @@
 
 #ifdef ENABLE_ELUNA
 #include "LuaEngine.h"
-#endif /* ENABLE_ELUNA */
+#endif
 
 class LoginQueryHolder : public SqlQueryHolder
 {
@@ -351,7 +351,8 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
 		delete pNewChar;
 		return;
 	}
-    sEluna->OnCreate(pNewChar);
+    if (Eluna* e = sWorld.GetEluna())
+        e->OnCreate(pNewChar);
 	delete pNewChar;
 #endif /* ENABLE_ELUNA */
 }
@@ -394,8 +395,9 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recv_data)
 
     // Used by Eluna
 #ifdef ENABLE_ELUNA
-    sEluna->OnDelete(lowguid);
-#endif /* ENABLE_ELUNA */
+    if (Eluna* e = sWorld.GetEluna())
+        e->OnDelete(lowguid);
+#endif
 
     // If the character is online (ALT-F4 logout for example)
     if (Player* onlinePlayer = sObjectAccessor.FindPlayer(guid))
@@ -735,8 +737,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     // Used by Eluna
 #ifdef ENABLE_ELUNA
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST))
-        sEluna->OnFirstLogin(pCurrChar);
-#endif /* ENABLE_ELUNA */
+        if (Eluna* e = sWorld.GetEluna())
+            e->OnFirstLogin(pCurrChar);
+#endif
 
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST))
         pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
@@ -786,8 +789,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
     // Used by Eluna
 #ifdef ENABLE_ELUNA
-    sEluna->OnLogin(pCurrChar);
-#endif /* ENABLE_ELUNA */
+    if (Eluna* e = sWorld.GetEluna())
+        e->OnLogin(pCurrChar);
+#endif
 
 }
 

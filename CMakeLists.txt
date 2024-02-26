@@ -20,6 +20,10 @@ cmake_minimum_required(VERSION 3.1...3.20)
 
 project(MaNGOS)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # Allow -DACE_ROOT, -DTBB_ROOT, etc.
 if(${CMAKE_VERSION} VERSION_GREATER "3.11")
   cmake_policy(SET CMP0074 NEW)

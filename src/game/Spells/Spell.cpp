@@ -4105,7 +4105,8 @@ void Spell::cast(bool skipCheck)
     // Used by Eluna
 #ifdef ENABLE_ELUNA
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
-        sEluna->OnSpellCast(m_caster->ToPlayer(), this, skipCheck);
+        if (Eluna* e = m_caster->GetEluna())
+            e->OnSpellCast(m_caster->ToPlayer(), this, skipCheck);
 #endif /* ENABLE_ELUNA */
 
     FillTargetMap();
