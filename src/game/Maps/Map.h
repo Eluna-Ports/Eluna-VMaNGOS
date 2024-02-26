@@ -38,6 +38,9 @@
 #include "SQLStorages.h"
 #include "ScriptCommands.h"
 #include "CreatureLinkingMgr.h"
+#ifdef ENABLE_ELUNA
+#include "LuaValue.h"
+#endif
 
 #include <bitset>
 #include <list>
@@ -49,6 +52,9 @@ using Movement::Vector3;
 
 struct CreatureInfo;
 class Creature;
+#ifdef ENABLE_ELUNA
+class Eluna;
+#endif
 class Unit;
 class WorldPacket;
 class InstanceData;
@@ -603,6 +609,12 @@ class Map : public GridRefManager<NGridType>
         bool ShouldUpdateMap(uint32 now, uint32 inactiveTimeLimit);
         void RemoveBones(Corpse* corpse);
 
+#ifdef ENABLE_ELUNA
+        Eluna* GetEluna() const;
+
+        LuaVal lua_data = LuaVal({});
+#endif
+
     private:
         void LoadMapAndVMap(int gx, int gy);
 
@@ -957,6 +969,10 @@ class Map : public GridRefManager<NGridType>
             &Map::ScriptCommand_LoadCreatureSpawn,      // 91
             &Map::ScriptCommand_StartScriptOnZone,      // 92
         };
+
+#ifdef ENABLE_ELUNA
+        Eluna* eluna;
+#endif
 
     public:
         CreatureGroupHolderType CreatureGroupHolder;
