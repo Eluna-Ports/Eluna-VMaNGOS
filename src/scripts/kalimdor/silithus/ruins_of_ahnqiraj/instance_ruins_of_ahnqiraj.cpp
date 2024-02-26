@@ -27,6 +27,8 @@ EndScriptData */
 #include "ruins_of_ahnqiraj.h"
 #include <random>
 
+#include <random>
+
 instance_ruins_of_ahnqiraj::instance_ruins_of_ahnqiraj(Map* pMap) : ScriptedInstance(pMap)
 {
     Initialize();

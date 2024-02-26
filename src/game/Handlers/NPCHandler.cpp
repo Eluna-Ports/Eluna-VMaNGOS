@@ -442,8 +442,8 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
             return;
         }
 
-        sEluna->HandleGossipSelectOption(GetPlayer(), item, GetPlayer()->PlayerTalkClass->GossipOptionSender(gossipListId), GetPlayer()->PlayerTalkClass->GossipOptionAction(gossipListId), code);
-
+        if (Eluna* e = GetPlayer()->GetEluna())
+            e->HandleGossipSelectOption(GetPlayer(), item, GetPlayer()->PlayerTalkClass->GossipOptionSender(gossipListId), GetPlayer()->PlayerTalkClass->GossipOptionAction(gossipListId), code);
     }
     else if (guid.IsPlayer())
     {
@@ -453,8 +453,8 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
             return;
         }
 
-        sEluna->HandleGossipSelectOption(GetPlayer(), GetPlayer()->PlayerTalkClass->GetGossipMenu().GetMenuId(), GetPlayer()->PlayerTalkClass->GossipOptionSender(gossipListId), GetPlayer()->PlayerTalkClass->GossipOptionAction(gossipListId), code);
-
+        if (Eluna* e = GetPlayer()->GetEluna())
+            e->HandleGossipSelectOption(GetPlayer(), GetPlayer()->PlayerTalkClass->GetGossipMenu().GetMenuId(), GetPlayer()->PlayerTalkClass->GossipOptionSender(gossipListId), GetPlayer()->PlayerTalkClass->GossipOptionAction(gossipListId), code);
     }
 #endif /* ENABLE_ELUNA */
 

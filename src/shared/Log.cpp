@@ -78,8 +78,8 @@ Log::Log() :
     logFiles[LOG_BASIC] = OpenLogFile("LogFile.Basic", g_mainLogFileName, log_file_timestamp, true);
 
 #ifdef ENABLE_ELUNA
-    logFiles[LOG_ELUNA] = openLogFile("LogFile.ElunaLogFile", "ElunaLogFile.log", log_file_timestamp, false);
-#endif /* ENABLE_ELUNA */
+    logFiles[LOG_ELUNA] = OpenLogFile("LogFile.ElunaLogFile", "ElunaLogFile.log", log_file_timestamp, false);
+#endif
 
     // Main log file settings
     m_wardenDebug = sConfig.GetBoolDefault("Warden.DebugLog", false);

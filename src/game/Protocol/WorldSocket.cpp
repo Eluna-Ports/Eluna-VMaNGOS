@@ -71,7 +71,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* newPct)
                     return -1;
                 }
 #ifdef ENABLE_ELUNA
-                if (!sEluna->OnPacketReceive(m_Session, *new_pct))
+                if (!sWorld.GetEluna()->OnPacketReceive(m_Session, *new_pct))
                     return 0;
 #endif /* ENABLE_ELUNA */
 
