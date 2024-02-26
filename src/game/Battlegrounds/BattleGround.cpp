@@ -38,7 +38,7 @@
 #include "Chat.h"
 #ifdef ENABLE_ELUNA
 #include "LuaEngine.h"
-#endif /* ENABLE_ELUNA */
+#endif
 
 namespace MaNGOS
 {
@@ -641,8 +641,9 @@ int32 BattleGround::GetHeraldEntry() const
 void BattleGround::EndBattleGround(Team winner)
 {
     #ifdef ENABLE_ELUNA
-        sEluna->OnBGEnd(this, GetTypeID(), GetInstanceID(), winner);
-    #endif /* ENABLE_ELUNA */
+    if (Eluna* e = GetBgMap()->GetEluna())
+        e->OnBGEnd(this, GetTypeID(), GetInstanceID(), winner);
+    #endif
     
     RemoveFromBGFreeSlotQueue();
 
@@ -1030,8 +1031,9 @@ void BattleGround::StartBattleGround()
     // and it doesn't matter if we call StartBattleGround() more times, because m_battleGrounds is a map and instance id never changes
     sBattleGroundMgr.AddBattleGround(GetInstanceID(), GetTypeID(), this);
 #ifdef ENABLE_ELUNA
-    sEluna->OnBGStart(this, GetTypeID(), GetInstanceID());
-#endif /* ENABLE_ELUNA */
+    if (Eluna* e = GetBgMap()->GetEluna())
+        e->OnBGStart(this, GetTypeID(), GetInstanceID());
+#endif
 }
 
 void BattleGround::AddPlayer(Player* pPlayer)

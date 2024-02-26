@@ -101,7 +101,8 @@ void Totem::Summon(Unit* owner)
         ((Creature*)owner)->AI()->JustSummoned((Creature*)this);
 
 #ifdef ENABLE_ELUNA
-    sEluna->OnSummoned(this, owner);
+    if (Eluna* e = GetEluna())
+        e->OnSummoned(this, owner);
 #endif /* ENABLE_ELUNA */
 
 

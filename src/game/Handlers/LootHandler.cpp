@@ -217,10 +217,14 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket & recv_data)
 
         --loot->unlootedCount;
 
-
         sLog.Player(this, LOG_LOOTS, LOG_LVL_MINIMAL, "%s loots %ux%u [loot from %s]", _player->GetShortDescription().c_str(), item->count, item->itemid, lguid.GetString().c_str());
         player->SendNewItem(newitem, uint32(item->count), false, false, true);
         player->OnReceivedItem(newitem);
+
+#ifdef ENABLE_ELUNA
+        if (Eluna* e = player->GetEluna())
+            e->OnLootItem(player, newitem, uint32(item->count), newitem->GetObjectGuid());
+#endif
     }
     else
         player->SendEquipError(msg, nullptr, nullptr, item->itemid);
@@ -324,7 +328,8 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recv_data*/)
         }
         // Used by Eluna
 #ifdef ENABLE_ELUNA
-        sEluna->OnLootMoney(player, pLoot->gold);
+        if (Eluna* e = player->GetEluna())
+            e->OnLootMoney(player, pLoot->gold);
 #endif /* ENABLE_ELUNA */
 
         pLoot->gold = 0;
@@ -734,12 +739,6 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
             target->GetShortDescription().c_str(), lootGuid.GetString().c_str());
         target->SendNewItem(newitem, uint32(item.count), false, false, true);
         target->OnReceivedItem(newitem);
-
-    // Used by Eluna
-#ifdef ENABLE_ELUNA
-    	sEluna->OnLootItem(target, newitem, item.count, lootGuid);
-#endif /* ENABLE_ELUNA */
-
     }
 
     // mark as looted

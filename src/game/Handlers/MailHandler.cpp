@@ -41,6 +41,10 @@
 #include "AccountMgr.h"
 #include "Database/DatabaseImpl.h"
 
+#ifdef ENABLE_ELUNA
+#include "LuaEngine.h"
+#endif
+
 void WorldSession::SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError, uint32 item_guid, uint32 item_count)
 {
     WorldPacket data(SMSG_SEND_MAIL_RESULT, (4 + 4 + 4 + (mailError == MAIL_ERR_EQUIP_ERROR ? 4 : (mailAction == MAIL_ITEM_TAKEN ? 4 + 4 : 0))));
@@ -364,6 +368,17 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
         return;
     }
     data.JustMailed(receiverAccount);
+
+#ifdef ENABLE_ELUNA
+    if (Eluna* e = loadedPlayer->GetEluna())
+    {
+        if (!e->OnSendMail(loadedPlayer, req->receiver))
+        {
+            SendMailResult(0, MAIL_SEND, MAIL_ERR_EQUIP_ERROR, EQUIP_ERR_CANT_DO_RIGHT_NOW);
+            return;
+        }
+    }
+#endif
 
     SendMailResult(0, MAIL_SEND, MAIL_OK);
 
