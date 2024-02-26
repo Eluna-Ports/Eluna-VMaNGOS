@@ -29,6 +29,10 @@
 #include "GridStates.h"
 #include <condition_variable>
 
+#ifdef ENABLE_ELUNA
+#include "ElunaConfig.h"
+#endif
+
 class BattleGround;
 
 enum
@@ -121,6 +125,21 @@ class MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockab
             i_timer.Reset();
         }
 
+#ifdef ENABLE_ELUNA
+        uint32 configThreads;
+
+        uint32 elunaCompat(uint32 numThreads)
+        {
+            if (sElunaConfig->IsElunaEnabled() && sElunaConfig->IsElunaCompatibilityMode() && numThreads > 1)
+            {
+                // Force 1 thread for Eluna if compatibility mode is enabled. Compatibility mode is single state and does not allow more update threads.
+                sLog.Out(LOG_ELUNA, LOG_LVL_ERROR, "Map update threads set to %i, when Eluna in compatibility mode only allows 1, changing to 1", numThreads);
+                numThreads = 1;
+            }
+            return numThreads;
+        }
+#endif
+
         //void LoadGrid(int mapid, int instId, float x, float y, WorldObject const* obj, bool no_unload = false);
         void UnloadAll();
 
@@ -179,6 +198,8 @@ class MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockab
         template<typename Do>
         void DoForAllMapsWithMapId(uint32 mapId, Do& _do);
 
+        void DoForAllMaps(const std::function<void(Map*)>& worker);
+
         void ScheduleInstanceSwitch(Player* player, uint16 newInstance);
         void SwitchPlayersInstances();
 
@@ -212,6 +233,7 @@ class MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockab
         DungeonMap* CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPersistentState* save = nullptr);
         BattleGroundMap* CreateBattleGroundMap(uint32 id, uint32 InstanceId, BattleGround* bg);
 
+        uint32 numThreads;
         uint32 i_gridCleanUpDelay;
         MapMapType i_maps;
         IntervalTimer i_timer;

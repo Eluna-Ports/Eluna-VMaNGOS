@@ -32,6 +32,10 @@
 #include "Language.h"
 #include "Map.h"
 
+#ifdef ENABLE_ELUNA
+#include "LuaEngine.h"
+#endif
+
 void WorldSession::SendTradeStatus(TradeStatus status)
 {
     WorldPacket data;
@@ -344,6 +348,18 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
             }
         }
     }
+
+#ifdef ENABLE_ELUNA
+    if (Eluna* e = _player->GetEluna())
+    {
+        if (!e->OnTradeAccept(_player, trader))
+        {
+            SendTradeStatus(TRADE_STATUS_TRADE_REJECTED);
+            my_trade->SetAccepted(false, true);
+            return;
+        }
+    }
+#endif
 
     if (his_trade->IsAccepted())
     {
@@ -669,6 +685,17 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         SendTradeStatus(TRADE_STATUS_TRIAL_ACCOUNT);
         return;
     }
+
+#ifdef ENABLE_ELUNA
+    if (Eluna* e = GetPlayer()->GetEluna())
+    {
+        if (!e->OnTradeInit(GetPlayer(), pOther))
+        {
+            SendTradeStatus(TRADE_STATUS_TRADE_REJECTED);
+            return;
+        }
+    }
+#endif
 
     // OK start trade
     _player->m_trade = new TradeData(_player, pOther);
