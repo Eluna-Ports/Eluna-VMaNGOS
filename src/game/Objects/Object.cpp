@@ -60,7 +60,7 @@
 #include "LuaEngine.h"
 #include "ElunaConfig.h"
 #include "ElunaEventMgr.h"
-#endif /* ENABLE_ELUNA */
+#endif
 
 ////////////////////////////////////////////////////////////
 // Methods of class MovementInfo
@@ -1460,8 +1460,8 @@ void WorldObject::SetVisibilityModifier(float f)
 WorldObject::WorldObject()
     : 
 #ifdef ENABLE_ELUNA
-	elunaEvents(NULL),
-#endif /* ENABLE_ELUNA */
+	elunaEvents(nullptr),
+#endif
     m_isActiveObject(false), m_visibilityModifier(DEFAULT_VISIBILITY_MODIFIER), m_currMap(nullptr),
         m_mapId(0), m_InstanceId(0), m_summonLimitAlert(0), worldMask(WORLD_DEFAULT_OBJECT), m_zoneScript(nullptr),
         m_transport(nullptr)
@@ -2329,7 +2329,7 @@ void WorldObject::ResetMap()
 {
     #ifdef ENABLE_ELUNA
     delete elunaEvents;
-    elunaEvents = NULL;
+    elunaEvents = nullptr;
     #endif
     m_currMap = nullptr;
     m_zoneScript = nullptr;
@@ -2516,7 +2516,7 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
     if (Unit* summoner = ToUnit())
         if (Eluna* e = GetEluna())
             e->OnSummoned(pCreature, summoner);
-#endif /* ENABLE_ELUNA */
+#endif
 
     // Creature Linking, Initial load is handled like respawn
     if (pCreature->IsLinkingEventTrigger())
@@ -3478,8 +3478,9 @@ void WorldObject::GetPosition(float &x, float &y, float &z, GenericTransport con
 void WorldObject::Update(uint32 update_diff, uint32 /*time_diff*/)
 {
     #ifdef ENABLE_ELUNA
-    elunaEvents->Update(update_diff);
-    #endif /* ENABLE_ELUNA */
+    if (elunaEvents)
+        elunaEvents->Update(update_diff);
+    #endif
 
     if (m_summonLimitAlert)
     {
