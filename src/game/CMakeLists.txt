@@ -576,7 +576,7 @@ if(SCRIPT_LIB_ELUNA)
         ${CMAKE_SOURCE_DIR}/src/modules/Eluna/*.h
         ${CMAKE_SOURCE_DIR}/src/modules/Eluna/hooks/*.cpp
         ${CMAKE_SOURCE_DIR}/src/modules/Eluna/hooks/*.h
-        ${CMAKE_SOURCE_DIR}/src/modules/Eluna/methods/VMangos/*.cpp
+        ${CMAKE_SOURCE_DIR}/src/modules/Eluna/methods/*.cpp
         ${CMAKE_SOURCE_DIR}/src/modules/Eluna/methods/VMangos/*.h
     )
     source_group("Eluna" FILES ${SRC_GRP_ELUNA})
@@ -596,8 +596,8 @@ target_link_libraries(game
 target_compile_definitions(game
     PUBLIC
       $<$<BOOL:${SCRIPT_LIB_ELUNA}>:ENABLE_ELUNA>
-      $<$<BOOL:${SCRIPT_LIB_ELUNA}>:CLASSIC>
-      $<$<BOOL:${SCRIPT_LIB_ELUNA}>:VMANGOS>
+      $<$<BOOL:${SCRIPT_LIB_ELUNA}>:ELUNA_EXPANSION=0>
+      $<$<BOOL:${SCRIPT_LIB_ELUNA}>:ELUNA_VMANGOS>
 )
 target_include_directories(game
     PUBLIC
