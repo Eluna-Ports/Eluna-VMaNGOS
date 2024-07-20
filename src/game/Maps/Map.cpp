@@ -219,7 +219,7 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
 #ifdef ENABLE_ELUNA
     // lua state begins uninitialized
     eluna = nullptr;
-    if (sElunaConfig->IsElunaEnabled() && !sElunaConfig->IsElunaCompatibilityMode() && sElunaLoader->ShouldMapLoadEluna(id))
+    if (sElunaConfig->IsElunaEnabled() && !sElunaConfig->IsElunaCompatibilityMode() && sElunaConfig->ShouldMapLoadEluna(id))
         eluna = new Eluna(this);
 
     if (Eluna* e = GetEluna())
