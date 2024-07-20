@@ -35,6 +35,12 @@ else()
   message(STATUS "Build scripts         : No")
 endif()
 
+if(SCRIPT_LIB_ELUNA)
+  message(STATUS "Build Eluna LUA Engine: Yes (default)")
+else()
+  message(STATUS "Build Eluna LUA Engine: No")
+endif()
+
 if(ENABLE_MAILSENDER)
   message(STATUS "Mailsender enabled    : Yes")
 else()
