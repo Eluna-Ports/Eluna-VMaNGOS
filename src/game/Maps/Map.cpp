@@ -2061,7 +2061,7 @@ void Map::CreateInstanceData(bool load)
 
 #ifdef ENABLE_ELUNA
     if (Eluna* e = GetEluna())
-        i_data = e->GetInstanceData(this);
+        m_data = e->GetInstanceData(this);
 #endif /* ENABLE_ELUNA */
 
     if (!m_mapEntry->scriptId)
