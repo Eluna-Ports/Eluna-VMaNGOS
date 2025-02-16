@@ -5497,7 +5497,7 @@ bool Player::UpdateSkillPro(uint16 skillId, int32 chance, uint32 step)
 
 #ifdef ENABLE_ELUNA
         if (Eluna* e = GetEluna())
-            e->OnSkillChange(this, skillId, new_value);
+            e->OnSkillChange(this, skillId, newValue);
 #endif
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Player::UpdateSkillPro Chance=%3.1f%% taken", chance / 10.0);
         return true;
