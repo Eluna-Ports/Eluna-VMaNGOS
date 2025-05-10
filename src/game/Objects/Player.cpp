@@ -16520,7 +16520,7 @@ void Player::SaveToDB(bool online, bool force)
 #ifdef ENABLE_ELUNA
     // Hack to check that this is not on create save
     if (Eluna* e = GetEluna())
-        if (!HasAtLoginFlag(AT_LOGIN_FIRST))
+        if (m_playedTime[PLAYED_TIME_TOTAL] != 0)
             e->OnSave(this);
 #endif
 

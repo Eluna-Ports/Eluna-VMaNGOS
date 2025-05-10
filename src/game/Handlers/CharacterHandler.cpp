@@ -725,7 +725,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
     // Used by Eluna
 #ifdef ENABLE_ELUNA
-    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST))
+    if (pCurrChar->m_playedTime[PLAYED_TIME_TOTAL] == 0)
         if (Eluna* e = sWorld.GetEluna())
             e->OnFirstLogin(pCurrChar);
 #endif
