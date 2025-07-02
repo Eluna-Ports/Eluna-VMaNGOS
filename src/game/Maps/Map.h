@@ -975,7 +975,7 @@ class Map : public GridRefManager<NGridType>
         };
 
 #ifdef ENABLE_ELUNA
-        Eluna* eluna;
+        std::unique_ptr<Eluna> eluna;
 #endif
 
     public:

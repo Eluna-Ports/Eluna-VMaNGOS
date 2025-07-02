@@ -89,7 +89,7 @@
 #include "LuaEngine.h"
 #include "ElunaConfig.h"
 #include "ElunaLoader.h"
-#endif /* ENABLE_ELUNA */
+#endif
 
 INSTANTIATE_SINGLETON_1(World);
 
@@ -161,12 +161,6 @@ World::World():
 // World destructor
 World::~World()
 {
-#ifdef ENABLE_ELUNA
-    // Delete world Eluna state
-    delete eluna;
-    eluna = nullptr;
-#endif
-
     // Empty the kicked session set
     while (!m_sessions.empty())
     {
@@ -966,7 +960,7 @@ void World::LoadConfigSettings(bool reload)
         if (Eluna* e = GetEluna())
             e->OnConfigLoad(reload);
     }
-#endif /* ENABLE_ELUNA */
+#endif
 
     setConfig(CONFIG_UINT32_EMPTY_MAPS_UPDATE_TIME, "MapUpdate.Empty.UpdateTime", 0);
     setConfigMinMax(CONFIG_UINT32_MAP_OBJECTSUPDATE_THREADS, "MapUpdate.ObjectsUpdate.MaxThreads", 4, 1, 20);
@@ -1739,7 +1733,7 @@ void World::SetInitialWorldSettings()
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         ELUNA_LOG_INFO("Starting Eluna world state...");
         // use map id -1 for the global Eluna state
-        eluna = new Eluna(nullptr, sElunaConfig->IsElunaCompatibilityMode());
+        eluna = std::make_unique<Eluna>(nullptr, sElunaConfig->IsElunaCompatibilityMode());
         ELUNA_LOG_INFO("");
     }
 #endif
@@ -1928,7 +1922,7 @@ void World::SetInitialWorldSettings()
     if (GetEluna())
         GetEluna()->OnConfigLoad(false); // Must be done after Eluna is initialized and scripts have run
     ELUNA_LOG_INFO("");
-#endif /* ENABLE_ELUNA */
+#endif
     m_broadcaster =
         std::make_unique<MovementBroadcaster>(getConfig(CONFIG_UINT32_PACKET_BCAST_THREADS),
                                               std::chrono::milliseconds(getConfig(CONFIG_UINT32_PACKET_BCAST_FREQUENCY)));
@@ -2109,7 +2103,7 @@ void World::Update(uint32 diff)
         e->UpdateEluna(diff);
         e->OnWorldUpdate(diff);
     }
-#endif /* ENABLE_ELUNA */
+#endif
 
     // Update groups with offline leaders
     if (m_timers[WUPDATE_GROUPS].Passed())
@@ -2764,7 +2758,7 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode)
 #ifdef ENABLE_ELUNA
     if (Eluna* e = GetEluna())
         e->OnShutdownInitiate(ShutdownExitCode(exitcode), ShutdownMask(options));
-#endif /* ENABLE_ELUNA */
+#endif
 }
 
 // Display a shutdown message to the user(s)
@@ -2815,7 +2809,7 @@ void World::ShutdownCancel()
 #ifdef ENABLE_ELUNA
     if (Eluna* e = GetEluna())
         e->OnShutdownCancel();
-#endif /* ENABLE_ELUNA */
+#endif
 }
 
 // Send a server message to the user(s)

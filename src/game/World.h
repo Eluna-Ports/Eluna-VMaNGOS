@@ -905,8 +905,8 @@ class World
         LFGQueue& GetLFGQueue() { return m_lfgQueue; }
 
 #ifdef ENABLE_ELUNA
-        Eluna* GetEluna() const { return eluna; }
-        Eluna* eluna;
+        Eluna* GetEluna() const { return eluna.get(); }
+        std::unique_ptr<Eluna> eluna;
 #endif
     protected:
         void _UpdateGameTime();
