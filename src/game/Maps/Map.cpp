@@ -63,7 +63,6 @@
 #include "ElunaLoader.h"
 #endif
 
-
 Map::~Map()
 {
 #ifdef ENABLE_ELUNA

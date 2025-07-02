@@ -2282,13 +2282,24 @@ void WorldObject::SetMap(Map* map)
     m_instanceId = map->GetInstanceId();
 
 #ifdef ENABLE_ELUNA
-    // in multistate mode, always reset in case Eluna is not active on the new mapAdd commentMore actions
-    if (elunaEvents && !sElunaConfig->IsElunaCompatibilityMode())
-        elunaEvents.reset();
+    // in multistate mode, always reset Map events, then recreate the Map events procesorAdd commentMore actions
+    if (!sElunaConfig->IsElunaCompatibilityMode())
+    {
+        auto& events = GetElunaEvents(m_mapId);
+        if (events)
+            events.reset();
 
-    if (Eluna* e = map->GetEluna())
-        if (!elunaEvents)
-            elunaEvents = std::make_unique<ElunaEventProcessor>(e, this);
+        if (Eluna* e = map->GetEluna())
+            events = std::make_unique<ElunaEventProcessor>(e, this);
+    }
+
+    // create the World events processor
+    if (Eluna* e = sWorld.GetEluna())
+    {
+        auto& events = GetElunaEvents(-1);
+        if (!events)
+            events = std::make_unique<ElunaEventProcessor>(e, this);
+    }
 #endif
 
     // Order is important, must be done after m_currMap is set
@@ -3450,8 +3461,11 @@ void WorldObject::GetPosition(float &x, float &y, float &z, GenericTransport con
 void WorldObject::Update(uint32 update_diff, uint32 /*time_diff*/)
 {
 #ifdef ENABLE_ELUNA
-    if (elunaEvents)
-        elunaEvents->Update(update_diff);
+    if (elunaMapEvents) // can be null on maps without elunaAdd commentMore actions
+        elunaMapEvents->Update(update_diff);
+
+    if (elunaWorldEvents)
+        elunaWorldEvents->Update(update_diff);
 #endif
 
     if (m_summonLimitAlert)

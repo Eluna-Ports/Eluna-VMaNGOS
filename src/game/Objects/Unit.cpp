@@ -213,8 +213,12 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
 
 
 #ifdef ENABLE_ELUNA
-    elunaEvents->Update(update_diff);
-#endif /* ENABLE_ELUNA */   
+    if (elunaMapEvents) // can be null on maps without elunaAdd commentMore actions
+        elunaMapEvents->Update(update_diff);
+
+    if (elunaWorldEvents) // can be null on maps without eluna
+        elunaWorldEvents->Update(update_diff);
+#endif   
 
     // Buffer spell system update time to save on performance when players are updated twice per
     // world update. We do not need to update spells when the interval is only a few ms (~10ms)

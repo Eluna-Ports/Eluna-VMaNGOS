@@ -812,9 +812,12 @@ class WorldObject : public Object
 
 		
 #ifdef ENABLE_ELUNA
-        std::unique_ptr<ElunaEventProcessor> elunaEvents;
+        std::unique_ptr<ElunaEventProcessor> elunaMapEvents;
+        std::unique_ptr<ElunaEventProcessor> elunaWorldEvents;
 
         Eluna* GetEluna() const;
+
+        std::unique_ptr<ElunaEventProcessor>& GetElunaEvents(int32 mapId) { return (mapId == -1) ? elunaWorldEvents : elunaMapEvents; }
 
         LuaVal lua_data = LuaVal({});
 #endif 
