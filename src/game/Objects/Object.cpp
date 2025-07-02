@@ -1457,10 +1457,7 @@ void WorldObject::SetVisibilityModifier(float f)
 
 WorldObject::WorldObject()
     :   
-#ifdef ENABLE_ELUNA
-        elunaEvents(nullptr),
-#endif /* ENABLE_ELUNA */
-	    m_isActiveObject(false), m_visibilityModifier(DEFAULT_VISIBILITY_MODIFIER), m_currMap(nullptr),
+        m_isActiveObject(false), m_visibilityModifier(DEFAULT_VISIBILITY_MODIFIER), m_currMap(nullptr),
         m_mapId(0), m_instanceId(0), m_summonLimitAlert(0), m_worldMask(WORLD_DEFAULT_OBJECT), m_zoneScript(nullptr),
         m_transport(nullptr)
 {
@@ -2284,21 +2281,15 @@ void WorldObject::SetMap(Map* map)
     m_mapId = map->GetId();
     m_instanceId = map->GetInstanceId();
 
-    #ifdef ENABLE_ELUNA
-    //@todo: possibly look into cleanly clearing all pending events from previous map's event mgr.
-
-    // if multistate, delete elunaEvents and set to nullptr. events shouldn't move across states.
-    // in single state, the timed events should move across maps
-    if (!sElunaConfig->IsElunaCompatibilityMode())
-    {
-        delete elunaEvents;
-        elunaEvents = nullptr; // set to null in case map doesn't use eluna
-    }
+#ifdef ENABLE_ELUNA
+    // in multistate mode, always reset in case Eluna is not active on the new mapAdd commentMore actions
+    if (elunaEvents && !sElunaConfig->IsElunaCompatibilityMode())
+        elunaEvents.reset();
 
     if (Eluna* e = map->GetEluna())
         if (!elunaEvents)
-            elunaEvents = new ElunaEventProcessor(e, this);
-    #endif
+            elunaEvents = std::make_unique<ElunaEventProcessor>(e, this);
+#endif
 
     // Order is important, must be done after m_currMap is set
     SetZoneScript();
@@ -2312,10 +2303,6 @@ Map* WorldObject::GetMap() const
 
 void WorldObject::ResetMap()
 {
-    #ifdef ENABLE_ELUNA
-    delete elunaEvents;
-    elunaEvents = nullptr;
-    #endif
     m_currMap = nullptr;
     m_zoneScript = nullptr;
 }
@@ -3462,10 +3449,10 @@ void WorldObject::GetPosition(float &x, float &y, float &z, GenericTransport con
 
 void WorldObject::Update(uint32 update_diff, uint32 /*time_diff*/)
 {
-    #ifdef ENABLE_ELUNA
+#ifdef ENABLE_ELUNA
     if (elunaEvents)
         elunaEvents->Update(update_diff);
-    #endif
+#endif
 
     if (m_summonLimitAlert)
     {

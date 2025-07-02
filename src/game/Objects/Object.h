@@ -39,6 +39,7 @@
 #include <string>
 #ifdef ENABLE_ELUNA
 #include "LuaValue.h"
+#include "ElunaEventMgr.h"
 #endif
 
 class WorldPacket;
@@ -811,7 +812,7 @@ class WorldObject : public Object
 
 		
 #ifdef ENABLE_ELUNA
-        ElunaEventProcessor* elunaEvents;
+        std::unique_ptr<ElunaEventProcessor> elunaEvents;
 
         Eluna* GetEluna() const;
 
