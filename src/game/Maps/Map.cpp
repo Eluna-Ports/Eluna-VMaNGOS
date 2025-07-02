@@ -188,11 +188,11 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
         int numMotionThreads = sWorld.getConfig(CONFIG_UINT32_CONTINENTS_MOTIONUPDATE_THREADS);
         int numVisabilityThreads = sWorld.getConfig(CONFIG_UINT32_MAP_VISIBILITYUPDATE_THREADS);
 #ifdef ENABLE_ELUNA
-        if (sElunaConfig->IsElunaEnabled() && (numMotionThreads > 0 || numVisabilityThreads > 1))
+        if (sElunaConfig->IsElunaEnabled() && (numMotionThreads > 1 || numVisabilityThreads > 1))
         {
-            if (numMotionThreads > 0)
+            if (numMotionThreads > 1)
             {
-                sLog.Out(LOG_ELUNA, LOG_LVL_ERROR, "Motion update threads set to %i, when Eluna is enabled only allows 0, changing to 0", numMotionThreads);
+                sLog.Out(LOG_ELUNA, LOG_LVL_ERROR, "Motion update threads set to %i, when Eluna is enabled only allows 1, changing to 1", numMotionThreads);
                 numMotionThreads = 0;
             }
             if (numVisabilityThreads > 1)
@@ -216,7 +216,8 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
 #ifdef ENABLE_ELUNA
     // lua state begins uninitialized
     eluna = nullptr;
-    if (sElunaConfig->IsElunaEnabled() && !sElunaConfig->IsElunaCompatibilityMode() && sElunaConfig->ShouldMapLoadEluna(id))
+
+    if (sElunaConfig->IsElunaEnabled() && sElunaConfig->ShouldMapLoadEluna(id))
         eluna = std::make_unique<Eluna>(this);
 
     if (Eluna* e = GetEluna())
@@ -1092,10 +1093,8 @@ void Map::Update(uint32 t_diff)
 #ifdef ENABLE_ELUNA
     if (Eluna* e = GetEluna())
     {
-        if (!sElunaConfig->IsElunaCompatibilityMode())
-            e->UpdateEluna(t_diff);
-
-        e->OnUpdate(this, t_diff);
+        e->UpdateEluna(t_diff);
+        e->OnMapUpdate(this, t_diff);
     }
 #endif
 
@@ -3898,13 +3897,3 @@ GameObject* Map::LoadGameObjectSpawn(uint32 dbGuid, bool delaySpawn)
     Add(pGameObject);
     return pGameObject;
 }
-
-#ifdef ENABLE_ELUNA
-Eluna* Map::GetEluna() const
-{
-    if (sElunaConfig->IsElunaCompatibilityMode())
-        return sWorld.GetEluna();
-
-    return eluna.get();
-}
-#endif

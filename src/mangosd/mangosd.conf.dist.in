@@ -3041,12 +3041,6 @@ DynamicRespawn.PlayersMaxLevelDiff      = 0
 #        Log file of Eluna errors detected at server run
 #        Default: "ElunaErrors.log"
 #
-#    Eluna.CompatibilityMode
-#        Description: Toggles Eluna between compatibility mode (single-threaded) or multistate mode. 
-#                     Compatibility mode limits the core to a single map update thread.
-#        Default:     true  - (enabled)
-#                     false - (disabled)
-#
 #    Eluna.OnlyOnMaps
 #        Description: When Eluna is enabled, a state will only be created for a list of specified maps
 #                     This only works for multistate mode.
@@ -3072,7 +3066,6 @@ DynamicRespawn.PlayersMaxLevelDiff      = 0
 ###################################################################################################################
 ElunaErrorLogFile = "ElunaErrors.log"
 Eluna.Enabled    = 1
-Eluna.CompatibilityMode = true
 Eluna.OnlyOnMaps = ""
 Eluna.TraceBack  = false
 Eluna.ScriptPath = "./lua_scripts"

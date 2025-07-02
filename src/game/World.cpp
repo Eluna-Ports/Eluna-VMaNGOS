@@ -1733,7 +1733,7 @@ void World::SetInitialWorldSettings()
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         ELUNA_LOG_INFO("Starting Eluna world state...");
         // use map id -1 for the global Eluna state
-        eluna = std::make_unique<Eluna>(nullptr, sElunaConfig->IsElunaCompatibilityMode());
+        eluna = std::make_unique<Eluna>(nullptr);
         ELUNA_LOG_INFO("");
     }
 #endif

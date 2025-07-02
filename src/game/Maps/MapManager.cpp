@@ -42,13 +42,7 @@ MapManager::MapManager()
     :
     i_gridCleanUpDelay(sWorld.getConfig(CONFIG_UINT32_INTERVAL_GRIDCLEAN)),
     i_MaxInstanceId(RESERVED_INSTANCES_LAST),
-#ifdef ENABLE_ELUNA
-    configThreads(sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_INSTANCED_UPDATE_THREADS)),
-    numThreads(elunaCompat(configThreads)),
-#else
-    numThreads(sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_INSTANCED_UPDATE_THREADS)),
-#endif
-    m_threads(new ThreadPool(numThreads)),
+    m_threads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_INSTANCED_UPDATE_THREADS))),
     m_instanceCreationThreads(new ThreadPool(1))
 {
     i_timer.SetInterval(sWorld.getConfig(CONFIG_UINT32_INTERVAL_MAPUPDATE));

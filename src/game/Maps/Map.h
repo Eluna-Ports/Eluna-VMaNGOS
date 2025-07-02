@@ -613,7 +613,7 @@ class Map : public GridRefManager<NGridType>
         void RemoveBones(Corpse* corpse);
 
 #ifdef ENABLE_ELUNA
-        Eluna* GetEluna() const;
+        Eluna* GetEluna() const { return eluna.get(); }
 
         LuaVal lua_data = LuaVal({});
 #endif
