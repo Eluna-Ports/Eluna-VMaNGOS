@@ -3457,14 +3457,6 @@ void WorldObject::GetPosition(float &x, float &y, float &z, GenericTransport con
 
 void WorldObject::Update(uint32 update_diff, uint32 /*time_diff*/)
 {
-#ifdef ENABLE_ELUNA
-    if (elunaMapEvents) // can be null on maps without elunaAdd commentMore actions
-        elunaMapEvents->Update(update_diff);
-
-    if (elunaWorldEvents)
-        elunaWorldEvents->Update(update_diff);
-#endif
-
     if (m_summonLimitAlert)
     {
         if (m_summonLimitAlert <= update_diff)
