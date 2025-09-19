@@ -214,11 +214,12 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
     LoadElevatorTransports();
 
 #ifdef ENABLE_ELUNA
-    // lua state begins uninitialized
-    eluna = nullptr;
-
     if (sElunaConfig->IsElunaEnabled() && sElunaConfig->ShouldMapLoadEluna(id))
-        eluna = std::make_unique<Eluna>(this);
+        if (!Instanceable())
+        {
+            m_elunaInfo = {ElunaInfoKey::MakeKey(GetId(), GetInstanceId())};
+            sElunaMgr->Create(this, m_elunaInfo);
+        }
 
     if (Eluna* e = GetEluna())
         e->OnCreate(this);
@@ -2058,9 +2059,14 @@ void Map::CreateInstanceData(bool load)
     if (m_data)
         return;
 
+    bool isElunaAI = false;
 #ifdef ENABLE_ELUNA
     if (Eluna* e = GetEluna())
+    {
         m_data = e->GetInstanceData(this);
+        if (m_data)
+            isElunaAI = true;
+    }
 #endif
 
     if (!m_mapEntry->scriptId)
@@ -2068,9 +2074,12 @@ void Map::CreateInstanceData(bool load)
 
     m_scriptId = m_mapEntry->scriptId;
 
-    m_data = sScriptMgr.CreateInstanceData(this);
-    if (!m_data)
-        return;
+    if (!isElunaAI)
+    {
+        m_data = sScriptMgr.CreateInstanceData(this);
+        if (!m_data)
+            return;
+    }
 
     if (load)
     {
